@@ -149,22 +149,22 @@ def main():
 
 
 
-order_items = []
-for item in order.items:
-    order_items.append({
-            "Name": item.name,
-            "Item Cost": item.calculate_cost(),
-            "Tax": item.calculate_tax()
-        })
+    order_items = []
+    for item in Order.items:
+        order_items.append({
+                "  Name": item.name,
+                "Item Cost": item.calculate_cost(),
+                "Tax": item.calculate_tax()
+            })
 
-    subtotal = order.calculate_subtotal()
-    tax = order.calculate_total_tax()
-    total = order.calculate_total_cost()
-    total_items = len(order.items)
-    generate_receipt(order_items, subtotal, tax, total, total_items)
-    print("Receipt saved as 'receipt.pdf'.")
-else:
-    print("No items in the order. No receipt generated.")
+        subtotal = order.calculate_subtotal()
+        tax = order.calculate_total_tax()
+        total = order.calculate_total_cost()
+        total_items = len(order.items)
+        generate_receipt(order_items, subtotal, tax, total, total_items)
+        print("Receipt saved as 'receipt.pdf'.")
+    else:
+        print("No items in the order. No receipt generated.")
 
 
 
