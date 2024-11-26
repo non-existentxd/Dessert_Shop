@@ -148,26 +148,24 @@ def main():
 
 
 
+    order_items = [
+        {
+            "Name": item.name,
+            "Cost": f"${item.calculate_cost()}",
+            "Tax": f"${item.calculate_tax()}"
+        }
+        ]
 
-    order_items = []
-    for item in Order.items:
-        order_items.append({
-                "  Name": item.name,
-                "Item Cost": item.calculate_cost(),
-                "Tax": item.calculate_tax()
-            })
+        
+    subtotal = f"${order.order_cost() + order.order_tax()}"
+    tax = f"${order.order_tax()}"
+    total = f"${order.order_cost()}"
+    total_items = order.__len__()
 
-        subtotal = order.calculate_subtotal()
-        tax = order.calculate_total_tax()
-        total = order.calculate_total_cost()
-        total_items = len(order.items)
-        generate_receipt(order_items, subtotal, tax, total, total_items)
-        print("Receipt saved as 'receipt.pdf'.")
-    else:
-        print("No items in the order. No receipt generated.")
-
+        
+    generate_receipt(order_items, subtotal, tax, total, total_items)
 
 
 
-if __name__ == "__main__":
-    main()
+
+main()

@@ -16,12 +16,12 @@ def generate_receipt(order_items, subtotal, tax, total, total_items):
 
     data = [["Name", "Item Cost", "Tax"]]
     for item in order_items:
-        data.append([item["Name"], f"${item['Item Cost']:.2f}", f"${item['Tax']:.2f}"])
+        data.append(f"{item["Name"]}, ${item['Cost']}, ${item['Tax']}")
 
 
-    data.append(["Order Subtotals", f"${subtotal:.2f}", f"${tax:.2f}"])
-    data.append(["Order Total", "", f"${total:.2f}"])
-    data.append(["Total Items in the Order", "", str(total_items)])
+    data.append(f"Order Subtotals, ${subtotal}, ${tax}")
+    data.append(f"Order Total" "${total}")
+    data.append(f"Total Items in the Order {str(total_items)}")
 
 
     table_style = TableStyle(
