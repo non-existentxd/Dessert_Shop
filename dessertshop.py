@@ -148,24 +148,25 @@ def main():
 
 
 
+
+
+
+
     order_items = [
         {
-            "Name": item.name,
-            "Cost": f"${item.calculate_cost()}",
-            "Tax": f"${item.calculate_tax()}"
+            "Name": f"{item.name}",  
+            "Item Cost": item.calculate_cost(),       
+            "Tax": item.calculate_tax()               
         }
-        ]
+    ]
 
-        
-    subtotal = f"${order.order_cost() + order.order_tax()}"
-    tax = f"${order.order_tax()}"
-    total = f"${order.order_cost()}"
-    total_items = order.__len__()
 
-        
+    subtotal = sum(item['Item Cost'] for item in order_items)
+    tax = sum(item['Tax'] for item in order_items)
+    total = subtotal + tax
+    total_items = len(order_items)
+
     generate_receipt(order_items, subtotal, tax, total, total_items)
-
-
 
 
 main()
