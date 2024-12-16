@@ -48,3 +48,6 @@ def generate_receipt(order_items, subtotal, tax, total, total_items):
     except Exception as e:
         print(f"Error generating receipt: {e}")
 
+
+#i wanna see if this is actually working...
+
