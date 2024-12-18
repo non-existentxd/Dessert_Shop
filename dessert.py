@@ -1,82 +1,72 @@
-from packaging import Packaging
+from abc import ABC, abstractmethod
 
-class DessertItem(Packaging):
-    def __init__(self, name: str):
+class Dessert(ABC):
+    def __init__(self, name, quantity, price_per_unit):
         self.name = name
-        self.packaging = None  # Default value
-
-
-class Candy(DessertItem):
-    def __init__(self, name: str, weight: float, price_per_lb: float):
-        super().__init__(name)
-        self.weight = weight
-        self.price_per_lb = price_per_lb
-        self.packaging = "Bag"
-
-    def __str__(self):
-        cost = self.weight * self.price_per_lb
-        tax = cost * 0.07
-        return (f"{self.name} ({self.packaging})\n"
-                f"      {self.weight:.2f} lbs. @ ${self.price_per_lb:.2f}/lb.: "
-                f"${cost:.2f}           [Tax: ${tax:.2f}]")
-
-
-
-class Cookie(DessertItem):
-    def __init__(self, name: str, quantity: int, price_per_dozen: float):
-        super().__init__(name)
         self.quantity = quantity
-        self.price_per_dozen = price_per_dozen
-        self.packaging = "Box"
+        self.price_per_unit = price_per_unit
+
+    @abstractmethod
+    def calculate_cost(self):
+        pass
+
+    def calculate_tax(self):
+        return self.calculate_cost() * 0.07
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+
+class Candy(Dessert):
+    def __init__(self, name, quantity, price_per_unit):
+        super().__init__(name, quantity, price_per_unit)
+
+    def calculate_cost(self):
+        return self.quantity * self.price_per_unit
 
     def __str__(self):
-        cost = (self.quantity / 12) * self.price_per_dozen
-        tax = cost * 0.07
-        return (f"{self.name} ({self.packaging})\n"
-                f"      {self.quantity} cookies @ ${self.price_per_dozen:.2f}/dozen: "
-                f"${cost:.2f}           [Tax: ${tax:.2f}]")
+        cost = self.calculate_cost()
+        tax = self.calculate_tax()
+        return f"{self.name}, {self.quantity}lbs, ${self.price_per_unit:.2f}/lb, ${cost:.2f}, ${tax:.2f}"
 
 
-class IceCream(DessertItem):
-    def __init__(self, name: str, scoops: int, price_per_scoop: float):
-        super().__init__(name)
-        self.scoops = scoops
-        self.price_per_scoop = price_per_scoop
-        self.packaging = "Bowl"
+class Cookie(Dessert):
+    def __init__(self, name, quantity, price_per_unit):
+        super().__init__(name, quantity, price_per_unit)
+
+    def calculate_cost(self):
+        return (self.quantity / 12) * self.price_per_unit  # Assume price per dozen
 
     def __str__(self):
-        cost = self.scoops * self.price_per_scoop
-        tax = cost * 0.07
-        return (f"{self.name} ({self.packaging})\n"
-                f"      {self.scoops} scoops @ ${self.price_per_scoop:.2f}/scoop: "
-                f"${cost:.2f}           [Tax: ${tax:.2f}]")
+        cost = self.calculate_cost()
+        tax = self.calculate_tax()
+        return f"{self.name}, {self.quantity} cookies, ${self.price_per_unit:.2f}/dozen, ${cost:.2f}, ${tax:.2f}"
+
+
+class IceCream(Dessert):
+    def __init__(self, name, quantity, price_per_unit):
+        super().__init__(name, quantity, price_per_unit)
+
+    def calculate_cost(self):
+        return self.quantity * self.price_per_unit
+
+    def __str__(self):
+        cost = self.calculate_cost()
+        tax = self.calculate_tax()
+        return f"{self.name}, {self.quantity} scoops, ${self.price_per_unit:.2f}/scoop, ${cost:.2f}, ${tax:.2f}"
 
 
 class Sundae(IceCream):
-    def __init__(self, name: str, scoops: int, price_per_scoop: float, topping: str, topping_price: float):
-        super().__init__(name, scoops, price_per_scoop)
-        self.topping = topping
+    def __init__(self, name, quantity, price_per_unit, topping_name, topping_price):
+        super().__init__(name, quantity, price_per_unit)
+        self.topping_name = topping_name
         self.topping_price = topping_price
-        self.packaging = "Boat"
+
+    def calculate_cost(self):
+        return super().calculate_cost() + self.topping_price
 
     def __str__(self):
-        ice_cream_cost = self.scoops * self.price_per_scoop
-        total_cost = ice_cream_cost + self.topping_price
-        tax = total_cost * 0.07
-        return (f"{self.name} ({self.packaging})\n"
-                f"      {self.scoops} scoops of {self.name} ice cream @ ${self.price_per_scoop:.2f}/scoop\n"
-                f"      {self.topping} topping @ ${self.topping_price:.2f}: "
-                f"${total_cost:.2f}           [Tax: ${tax:.2f}]")
-
-class Order:
-    def __init__(self):
-        self.items = []
-
-    def add(self, item: DessertItem):
-        self.items.append(item)
-
-    def __str__(self):
-        result = []
-        for item in self.items:
-            result.append(str(item))
-        return "\n".join(result)
+        cost = self.calculate_cost()
+        tax = self.calculate_tax()
+        return f"{self.topping_name} {self.name} Sundae, {self.quantity} scoops, ${self.price_per_unit:.2f}/scoop, ${cost:.2f}, ${tax:.2f}"

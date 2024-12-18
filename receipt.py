@@ -1,53 +1,36 @@
-from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, TableStyle, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 
-def generate_receipt(order_items, subtotal, tax, total, total_items):
+def make_receipt(data, out_file_name):
+    print(f"Attempting to generate receipt PDF at: {out_file_name}")
+
     try:
-
-        pdf_path = "receipt.pdf"
-        pdf = SimpleDocTemplate(pdf_path, pagesize=A4)
-
-
+        pdf = SimpleDocTemplate(out_file_name, pagesize=A4)
+        
         styles = getSampleStyleSheet()
+        
         title_style = styles["Heading1"]
         title_style.alignment = 1
-
-
-        title = Paragraph("Dessert Shop Receipt", title_style)
-        spacer = Spacer(1, 20) 
-
-        data = [["Name", "Item Cost", "Tax"]]
-        for item in order_items:
-            if not all(key in item for key in ("Name", "Item Cost", "Tax")):
-                raise ValueError("Each item must have 'Name', 'Item Cost', and 'Tax' keys.")
-            data.append([item["Name"], f"${item['Item Cost']:.2f}", f"${item['Tax']:.2f}"])
-
-
-        data.append(["Order Subtotals", f"${subtotal:.2f}", f"${tax:.2f}"])
-        data.append(["Order Total", "", f"${total:.2f}"])
-        data.append(["Total Items in the Order", "", str(total_items)])
-
-        table_style = TableStyle(
+        title = Paragraph("Receipt", title_style)
+        
+        style = TableStyle(
             [
-                ("BOX", (0, 0), (-1, -1), 1, colors.black),
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ("BACKGROUND", (0, 0), (-1, 0), colors.gray),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("BOX", (0, 0), (-1, -1), 1, colors.black), 
+                ("GRID", (0, 0), (-1, len(data) + 1), 1, colors.black), 
+                ("BACKGROUND", (0, 0), (3, 0), colors.gray), 
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke), 
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  
             ]
         )
 
-        table = Table(data, style=table_style)
+        table = Table(data, style=style)
 
-        pdf.build([title, spacer, table])
-        print(f"Receipt successfully generated at: {pdf_path}")
-
+        pdf.build([title, table])
+        
+        print(f"Receipt PDF successfully created at {out_file_name}")
+    
     except Exception as e:
-        print(f"Error generating receipt: {e}")
-
-
-#i wanna see if this is actually working...
-
+        print(f"Error in generating the PDF: {e}")
