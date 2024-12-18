@@ -1,5 +1,6 @@
 from dessert import Candy, Cookie, IceCream, Sundae
-import receipt
+from receipt import generate_receipt
+from order import Order
 
 class DessertShop:
     @staticmethod
@@ -95,6 +96,7 @@ class DessertShop:
                 print(e)
         return Sundae(name, scoops, price_per_scoop, topping, price_for_topping)
 
+
 class Order:
     def __init__(self):
         self.items = []
@@ -109,21 +111,40 @@ class Order:
         return sum(item.calculate_tax() for item in self.items)
 
     def get_data(self):
-        data = [["Name", "Quantity", "Unit Price", "Cost", "Tax"]]
+        data = [["Name", "Quantity", "Unit Price", "Cost", "Tax", "Packaging"]]  
 
         for item in self.items:
-            item_data = str(item).split(", ")
-            data.append([col.strip() for col in item_data])
-        
+            item_name = item.name  
+            item_quantity = item.quantity if hasattr(item, 'quantity') else ""
+            item_price_per_unit = item.price_per_unit if hasattr(item, 'price_per_unit') else ""
+            item_cost = item.calculate_cost() if hasattr(item, 'calculate_cost') else 0
+            item_tax = item.calculate_tax() if hasattr(item, 'calculate_tax') else 0
+            item_packaging = item.packaging if hasattr(item, 'packaging') else ""
+
+
+            item_row = [
+                item_name, 
+                item_quantity, 
+                f"${item_price_per_unit:.2f}" if item_price_per_unit else "", 
+                f"${item_cost:.2f}", 
+                f"${item_tax:.2f}",
+                item_packaging 
+            ]
+
+
+            data.append(item_row)
+
 
         subtotal = self.order_cost()
         tax = self.order_tax()
         total = subtotal + tax
-        data.append(["Order Subtotal", "", "", f"${subtotal:.2f}", f"${tax:.2f}"])
-        data.append(["Order Total", "", "", f"${total:.2f}", ""])
-        data.append(["Total items in the order", "", "", len(self.items), ""])
+        data.append(["Order Subtotal", "", "", f"${subtotal:.2f}", f"${tax:.2f}", ""])
+        data.append(["Order Total", "", "", f"${total:.2f}", "", ""])
+        data.append(["Total items in the order", "", "", len(self.items), "", ""])
 
         return data
+
+
 
 def main():
     print("Welcome to the Dessert Shop!")
@@ -152,8 +173,20 @@ def main():
     print(order)
 
     data = order.get_data()
+
+
+    subtotal = order.order_cost()
+    tax = order.order_tax()
+    total = subtotal + tax
+    totals = {
+        "Order Subtotal": subtotal,
+        "Order Total": total,
+        "Total items in the order": len(order.items)
+    }
+
     pdf_path = "receipt.pdf"
-    receipt.make_receipt(data, pdf_path)
+    generate_receipt(data, pdf_path)  
     print(f"\nReceipt PDF has been saved to: {pdf_path}")
+
 
 main()
